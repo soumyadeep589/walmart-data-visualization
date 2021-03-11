@@ -112,7 +112,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-walmart_venv/
 
 # Spyder project settings
 .spyderproject
