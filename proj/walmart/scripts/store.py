@@ -23,7 +23,9 @@ def store_product_info(product_keys):
         try:
             client = ScraperAPIClient('2afffa25a502bf4f254f972578ad9550')
             result = client.get(url=url)
-            if result.status_code == 500:
+            if result.status_code == 200:
+                res_json = result.json()
+            elif result.status_code == 500:
                 raise Exception("Request not successful, status: 500")
             elif result.status_code == 403:
                 raise Exception("Plan max request exceeded, status: 403")
@@ -31,14 +33,13 @@ def store_product_info(product_keys):
                 raise Exception("Request not found, status: 404")
             elif result.status_code == 410:
                 raise Exception("Request gone or deleted, status: 410")
-            res_json = result.json()
         except Exception as e:
-            print("failed to fetch product info, something went wrong: " + str(e))
+            print("failed to fetch product info, error: " + str(e))
 
         try:
             store_to_db(res_json["products"])
         except Exception as e:
-            print("failed to save product info, something went wrong: " + str(e))
+            print("failed to save product info, error: " + str(e))
 
 
 def store_to_db(products):
