@@ -120,6 +120,17 @@ USE_L10N = True
 USE_TZ = True
 
 
+CELERY_BROKER_URL = 'redis://localhost:6379'   
+# If time zones are active (USE_TZ = True) define your local 
+CELERY_TIMEZONE = 'Asia/Kolkata'
+CELERY_BEAT_SCHEDULE = {
+    'save-product-info-to-db': {
+       'task': 'product_info',
+       'schedule': 21600.0,
+    }
+}
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 

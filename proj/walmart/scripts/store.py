@@ -22,7 +22,6 @@ def store_product_info(product_keys):
         url = gen_url(base_url, count, offset, page, store_id, key)
         client = ScraperAPIClient('2afffa25a502bf4f254f972578ad9550')
         result = client.get(url=url).json()
-        print(result["products"][0]["USItemId"])
         store_to_db(result["products"])
 
 
