@@ -20,9 +20,23 @@ from walmart.scripts.upload_constants import base_url, count, offset, page, stor
 def store_product_info(product_keys):
     for key in product_keys:
         url = gen_url(base_url, count, offset, page, store_id, key)
-        client = ScraperAPIClient('2afffa25a502bf4f254f972578ad9550')
-        result = client.get(url=url).json()
-        store_to_db(result["products"])
+        try:
+            client = ScraperAPIClient('2afffa25a502bf4f254f972578ad9550')
+            result = client.get(url=url)
+            if result.status_code == 500:
+                raise Exception("Request not successful, status: 500")
+            elif result.status_code == 403:
+                raise Exception("Plan max request exceeded, status: 403")
+            elif result.status_code == 404:
+                raise Exception("Request not found, status: 404")
+            res_json = result.json()
+        except Exception as e:
+            print("failed to fetch product info, something went wrong: " + str(e))
+
+        try:
+            store_to_db(res_json["products"])
+        except Exception as e:
+            print("failed to save product info, something went wrong: " + str(e))
 
 
 def store_to_db(products):
