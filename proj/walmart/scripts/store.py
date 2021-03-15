@@ -8,13 +8,14 @@ from scraper_api import ScraperAPIClient
 from walmart.models import Product
 from walmart.scripts.product_keys import product_keys
 from walmart.scripts.upload_constants import base_url, count, offset, page, store_id
+from django.conf import settings
 
 
 def store_product_info(product_keys):
     for key in product_keys:
         url = gen_url(base_url, count, offset, page, store_id, key)
         try:
-            client = ScraperAPIClient('2afffa25a502bf4f254f972578ad9550')
+            client = ScraperAPIClient(settings.SCRAPER_API_KEY)
             result = client.get(url=url)
             if result.status_code == 200:
                 res_json = result.json()
