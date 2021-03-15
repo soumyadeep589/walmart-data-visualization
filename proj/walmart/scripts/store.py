@@ -1,13 +1,6 @@
 import os
-import sys
-
 import django
-import requests
-import json
-import random
 
-proj_dir = os.environ["PROJDIR"]
-sys.path.append(os.path.join(proj_dir, "dj"))
 os.environ["DJANGO_SETTINGS_MODULE"] = "proj.settings"
 django.setup()
 
