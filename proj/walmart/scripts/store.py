@@ -29,6 +29,8 @@ def store_product_info(product_keys):
                 raise Exception("Plan max request exceeded, status: 403")
             elif result.status_code == 404:
                 raise Exception("Request not found, status: 404")
+            elif result.status_code == 410:
+                raise Exception("Request gone or deleted, status: 410")
             res_json = result.json()
         except Exception as e:
             print("failed to fetch product info, something went wrong: " + str(e))
