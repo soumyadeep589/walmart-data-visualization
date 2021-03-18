@@ -1,5 +1,6 @@
 import os
 import django
+import structlog
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "proj.settings"
 django.setup()
@@ -10,6 +11,14 @@ from walmart.scripts.product_keys import product_keys
 from walmart.scripts.upload_constants import base_url, count, offset, page, store_id
 from django.conf import settings
 
+structlog.dev.ConsoleRenderer(
+    pad_event=30,
+    colors=True,
+    force_colors=True,
+    repr_native_str=False,
+    level_styles=None,
+)
+logger = structlog.get_logger(__name__)
 
 def store_product_info(product_keys):
     for key in product_keys:
@@ -28,12 +37,12 @@ def store_product_info(product_keys):
             elif result.status_code == 410:
                 raise Exception("Request gone or deleted, status: 410")
         except Exception as e:
-            print("failed to fetch product info, error: " + str(e))
+            logger.error("failed to fetch product info, error: " + str(e))
 
         try:
             store_to_db(res_json["products"])
         except Exception as e:
-            print("failed to save product info, error: " + str(e))
+            logger.error("failed to save product info, error: " + str(e))
 
 
 def store_to_db(products):
