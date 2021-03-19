@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.indexes import GinIndex
 
 # Create your models here.
 
@@ -16,6 +17,7 @@ class Product(models.Model):
         db_table = "product"
         verbose_name_plural = "products"
         ordering = ["id"]
+        indexes = [GinIndex(fields=['name'])]
 
     def __str__(self):
         return f"{self.id}, product_id: {self.product_id}, name: {self.name}"

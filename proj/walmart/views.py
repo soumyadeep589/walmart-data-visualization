@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from walmart.models import Product
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView
+import json
 # Create your views here.
 
 
@@ -27,3 +29,24 @@ class ChartData(APIView):
         return Response(data)
 
     
+class SearchView(TemplateView):
+    template_name = "search.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        kw = self.request.GET.get("search")
+        products = Product.objects.filter(name__icontains=kw).values().distinct()[:10]
+        res = []
+        for product in products:
+            same_name_products = Product.objects.filter(name=product["name"]).values()
+            dates = [elem["created_on"].date().strftime('%d-%m-%y') for elem in same_name_products]
+            prices = [float(elem["display_price"]) for elem in same_name_products]
+            data = {
+                    "name": product["name"],
+                    "dates": dates,
+                    "prices": prices,
+            }
+            res.append(data)
+
+        context["results"] = res
+        return context

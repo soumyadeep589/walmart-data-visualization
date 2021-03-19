@@ -1,1 +1,1 @@
-product_keys = ["pencil"]
+product_keys = ["pencil", "cake", "shoe"]
