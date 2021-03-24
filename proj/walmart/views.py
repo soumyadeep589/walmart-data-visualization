@@ -1,10 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from walmart.models import Product
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
-import json
+from django.urls import reverse_lazy, reverse
+from django.http import HttpResponse
+from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
+
 # Create your views here.
 
 
@@ -50,3 +54,19 @@ class SearchView(TemplateView):
 
         context["results"] = res
         return context
+
+
+def handle_signup(request):
+    if request.method == 'POST':
+        username = request.POST["username"]
+        email = request.POST["email"]
+        password = request.POST["password"]
+
+        user = User.objects.create_user(username, email, password)
+
+
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    else:
+        return HttpResponse('404 Not found')
