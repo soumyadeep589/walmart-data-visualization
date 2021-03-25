@@ -7,7 +7,6 @@
     <div class="row">
         <div class="col-12">
             <h3 >Results for <span class="text-info">"{{ request.GET.search }}"</span>:</h3>
-            <hr>
             {% for result in results %}
             <div class="row">
                 <div class="col-8 my-4">
@@ -16,7 +15,7 @@
                         <canvas id="myChart{{ forloop.counter0 }}" width="400" height="200"></canvas>
                         <script>
                             var ctx = document.getElementById("myChart" + {{ forloop.counter0 }});
-                            
+
                             var dates = {{ result.dates|safe }};
                             var prices = {{ result.prices|safe }};
                             

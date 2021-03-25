@@ -7,5 +7,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     url(r'^api/chart/data/$', views.ChartData.as_view(), name='api-data'),
     path('search/', views.SearchView.as_view(), name="search"),
+    path('signup/', views.handle_signup, name="signup"),
+    path('login/', views.handle_login, name="login"),
+    path('logout/', views.handle_logout, name="logout"),
 ]
 

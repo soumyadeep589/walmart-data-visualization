@@ -14,6 +14,7 @@ import os
 import structlog
 from dotenv import load_dotenv
 from os.path import join, dirname
+from django.contrib.messages import constants as messages
 
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv()
@@ -197,6 +198,9 @@ CELERY_BEAT_SCHEDULE = {
     }
 }
 
+MESSAGE_TAGS = {
+    messages.ERROR: "danger",
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
