@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from walmart.models import Product
+from walmart.models import Product, UserProductAlert
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.urls import reverse_lazy, reverse
@@ -23,10 +23,12 @@ class ChartData(APIView):
 
     def get(self, request, format=None):
         products = Product.objects.filter(product_id=489882644).values()
+        id = products[0]["product_id"]
         name = products[0]["name"]
         dates = [elem["created_on"].date() for elem in products]
         prices = [elem["display_price"] for elem in products]
         data = {
+                "id": id,
                 "name": name,
                 "dates": dates,
                 "prices": prices,
@@ -51,6 +53,7 @@ class SearchView(TemplateView):
             prices = [float(elem["display_price"])
                             for elem in same_name_products]
             data = {
+                    "product_id": product["product_id"],
                     "name": product["name"],
                     "dates": dates,
                     "prices": prices,
@@ -97,7 +100,26 @@ def handle_login(request):
     else:
         return HttpResponse('404 Not found')
 
+
 def handle_logout(request):
     logout(request)
     messages.success(request, "Successfully logged out")
     return redirect('index')
+
+
+def set_alert(request):
+    if request.method == "POST":
+        user = request.user
+        product_id = request.POST["product_id"]
+        price = request.POST["price"]
+
+    
+        if UserProductAlert.objects.filter(user=user, product_id=product_id).exists():
+            alert = UserProductAlert.objects.get(user=user, product_id=product_id)
+            alert.alert_price = price
+            alert.save()
+        else:
+            UserProductAlert.objects.create(user=user, product_id=product_id, alert_price=price)
+
+        messages.success(request, "alert saved successfully")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
