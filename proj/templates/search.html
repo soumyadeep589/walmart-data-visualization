@@ -6,13 +6,13 @@
 <div class="container my-4">
     <div class="row">
         <div class="col-12">
-            <h3>Results for <span class="text-info">"{{ request.GET.search }}"</span>:</h3>
+            <h4>Results for <span class="text-info">"{{ request.GET.search }}"</span>:</h4>
             {% for result in results %}
             <div class="row">
-                <div class="col-8 my-4">
-                    <h4>{{result.name}}</h4>
+                <div class="col-sm-8 my-4">
+                    <h5 class="product-name">{{result.name}}</h5>
                     <div>
-                        <canvas id="myChart{{ forloop.counter0 }}" width="400" height="200"></canvas>
+                        <canvas id="myChart{{ forloop.counter0 }}" width="400" height="350"></canvas>
                         <script>
                             var ctx = document.getElementById("myChart" + {{ forloop.counter0 }});
 
@@ -62,17 +62,21 @@
                         </script>
                     </div>
                 </div>
-                <div class="col-4 my-4">
-                    <form class="form-inline" action="{% url 'alert' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="product_id" value="{{result.product_id}}" />
-                        <div class="form-group mr-2 mb-2">
-                            <label for="price">Set Price Alert: </label>
-                            <input type="number" class="form-control" id="price" name="price" placeholder="Price"
-                                min="0" step="any">
+                <div class="col-sm-4 my-4 d-flex align-items-center">
+                    <div class="card my-10 container-fluid">
+                        <div class="card-body">
+                          <h5 class="card-title">Set Alert</h5>
+                          <form action="{% url 'alert' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{result.product_id}}" />
+                            <div class="form-group mr-2 mb-2 overflow-hidden">
+                                <input type="number" class="form-control" id="price" name="price" placeholder="Price"
+                                    min="0" step="any" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-2 mx-auto">Set Alert</button>
+                        </form>
                         </div>
-                        <button type="submit" class="btn btn-primary mb-2">Set Alert</button>
-                    </form>
+                    </div>
                 </div>
             </div>
             {% endfor %}

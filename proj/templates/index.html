@@ -2,83 +2,84 @@
 
 {% block title %}Index{% endblock %}
 
-<script>
-    {% block jquery %}
-    var endpoint = '/walmart/api/chart/data/'
-    var defaultData = []
-    var labels = [];
-    $.ajax({
-        method: "GET",
-        url: endpoint,
-        success: function(data){
-            labels = data.dates
-            defaultData = data.prices
-            setChart()
-            $("#product-name").html(data.name)
-        },
-        error: function(error_data){
-            console.log("error")
-            console.log(error_data)
-        }
-    })
-    
-    function setChart(){
-        var ctx = document.getElementById("myChart");
-    
-        var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Daily Price Changes',
-                    data: defaultData,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255,99,132,1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true
-                        },
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Price ( $ )'
-                        }
-                    }]
-                }
-            }
-        });
-    }
-    {% endblock %}
-</script>
-
 {% block content %}
-    <div class="container my-5">
-        <div class='row'>
-            <div class='col-12' url-endpoint='{% url "api-data" %}'>
-                <h3 id="product-name"></h3>
-                <div class='col-8'>
-                    <canvas id="myChart" width="200" height="100"></canvas>
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            {% for result in results %}
+            <div class="row">
+                <div class="col-sm-8 my-4">
+                    <h5 class="product-name">{{result.name}}</h5>
+                    <div>
+                        <canvas id="myChart{{ forloop.counter0 }}" width="400" height="350"></canvas>
+                        <script>
+                            var ctx = document.getElementById("myChart" + {{ forloop.counter0 }});
+
+                            var dates = {{ result.dates| safe }};
+                            var prices = {{ result.prices| safe }};
+
+                            var myChart = new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: dates,
+                                    datasets: [{
+                                        label: 'Daily Price Changes',
+                                        data: prices,
+                                        backgroundColor: [
+                                            'rgba(255, 99, 132, 0.2)',
+                                            'rgba(54, 162, 235, 0.2)',
+                                            'rgba(255, 206, 86, 0.2)',
+                                            'rgba(75, 192, 192, 0.2)',
+                                            'rgba(153, 102, 255, 0.2)',
+                                            'rgba(255, 159, 64, 0.2)'
+                                        ],
+                                        borderColor: [
+                                            'rgba(255,99,132,1)',
+                                            'rgba(54, 162, 235, 1)',
+                                            'rgba(255, 206, 86, 1)',
+                                            'rgba(75, 192, 192, 1)',
+                                            'rgba(153, 102, 255, 1)',
+                                            'rgba(255, 159, 64, 1)'
+                                        ],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        yAxes: [{
+                                            ticks: {
+                                                beginAtZero: true
+                                            },
+                                            scaleLabel: {
+                                                display: true,
+                                                labelString: 'Price ( $ )'
+                                            }
+                                        }]
+                                    }
+                                }
+                            });
+                        </script>
+                    </div>
+                </div>
+                <div class="col-sm-4 my-4 d-flex align-items-center">
+                    <div class="card my-10 container-fluid">
+                        <div class="card-body">
+                          <h5 class="card-title">Set Alert</h5>
+                          <form action="{% url 'alert' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{result.product_id}}" />
+                            <div class="form-group mr-2 mb-2 overflow-hidden">
+                                <input type="number" class="form-control" id="price" name="price" placeholder="Price"
+                                    min="0" step="any" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-2 mx-auto">Set Alert</button>
+                        </form>
+                        </div>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
     </div>
-    
+</div>
 {% endblock %}

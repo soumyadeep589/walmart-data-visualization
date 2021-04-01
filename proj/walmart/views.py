@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -34,6 +35,32 @@ class ChartData(APIView):
                 "prices": prices,
         }
         return Response(data)
+
+
+class IndexView(TemplateView):
+    template_name = "index.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        products = Product.objects.values().distinct()[:10]
+        res = []
+        for product in products:
+            same_name_products = Product.objects.filter(
+                name=product["name"]).values()
+            dates = [elem["created_on"].date().strftime('%d-%m-%y')
+                                             for elem in same_name_products]
+            prices = [float(elem["display_price"])
+                            for elem in same_name_products]
+            data = {
+                    "product_id": product["product_id"],
+                    "name": product["name"],
+                    "dates": dates,
+                    "prices": prices,
+            }
+            res.append(data)
+
+        context["results"] = res
+        return context
 
 
 class SearchView(TemplateView):
@@ -108,12 +135,15 @@ def handle_logout(request):
 
 
 def set_alert(request):
+    if not request.user.is_authenticated:
+        messages.info(request, "please login to set alert")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
     if request.method == "POST":
         user = request.user
         product_id = request.POST["product_id"]
         price = request.POST["price"]
 
-    
         if UserProductAlert.objects.filter(user=user, product_id=product_id).exists():
             alert = UserProductAlert.objects.get(user=user, product_id=product_id)
             alert.alert_price = price
