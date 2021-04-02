@@ -43,10 +43,10 @@ function manage() {
 
 
 function recreatedb() {
-  psql -h pg -U postgres -c "CREATE USER root IF NOT EXISTS;"
-  psql -h pg -U postgres -c "ALTER USER root WITH SUPERUSER;"
-  psql -h pg -c "DROP DATABASE IF EXISTS walmart;" template1
-  psql -h pg -c "CREATE DATABASE walmart" template1
+  psql -h localhost -U postgres -c "CREATE USER root IF NOT EXISTS;"
+  psql -h localhost -U postgres -c "ALTER USER root WITH SUPERUSER;"
+  psql -h localhost -c "DROP DATABASE IF EXISTS walmart;" template1
+  psql -h localhost -c "CREATE DATABASE walmart" template1
   migrate $*
 }
 
