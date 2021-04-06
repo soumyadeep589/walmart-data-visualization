@@ -102,7 +102,7 @@ def handle_signup(request):
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
         user = User.objects.create_user(username, email, password)
-
+        messages.success(request, "Successfully signed up")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     else:
